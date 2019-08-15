@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 18
 __lua__
 function _init()
-	--music(0,0,0)
+	music(0,0,0)
 	_upd=update_title
 	_drw=draw_title
 	dirx={-1,1,0,0}
@@ -15,7 +15,29 @@ function _init()
 	}
 	mobcanattack=true
 	notifications={}
-	
+	zoomdur=200
+	zoom=0
+	player={
+		x=3,
+		y=10,
+		ox=0,
+		oy=0,
+		character=1,
+		isleft=false,
+		life={10,10,10,10},
+		maxlife={10,10,10,10},
+		attack={1,2,1,5},
+		range={0,1,0,1},
+		level=1,
+		colors={8,3,9,14},
+		xp=0,
+		xptable={10,20,30,40,50,60},
+		mana=5,
+		maxmana=5,
+		abbrev={"du:","lu:","mi:","el:"},
+		dustheal=1,
+	}
+	confirmdur=20
 end
 
 function _update()
@@ -31,7 +53,7 @@ end
 
 function startgame()
 	buttbuff=-1
-	--music(2,0,0)
+	music(2,0,0)
 	player={
 		x=3,
 		y=10,
@@ -76,9 +98,9 @@ end
 --update
 function update_title()
 	if btnp(❎) or btnp(🅾️) then
-		_upd=update_game
-		_drw=draw_game
-		startgame()
+		--_upd=update_game
+		sfx(60)
+		_drw=draw_confirm
 	end
 end
 
@@ -126,12 +148,14 @@ end
 function draw_title()
 	cls()
 	local x,y = 30,40
-	for i=0,9 do
-		spr(192+i,x+i*8,y+0)
-		spr(208+i,x+i*8,y+8)
-		spr(224+i,x+i*8,y+16)
-		spr(240+i,x+i*8,y+24)
-	end
+	-- for i=0,9 do
+	-- 	spr(192+i,x+i*8,y+0)
+	-- 	spr(208+i,x+i*8,y+8)
+	-- 	spr(224+i,x+i*8,y+16)
+	-- 	spr(240+i,x+i*8,y+24)
+	-- end
+	sspr(0,96,74,26,30,40)
+	
 	spr(1,x,y+35)
 	print(":life⬆️",x+8,y+37)
 	
@@ -143,9 +167,50 @@ function draw_title()
 	
 	spr(4,x+40,y+55)
 	print(":power",x+48,y+57)
-	print_centered("press ❎/🅾️ to start",120)
+	print_centered("press ❎/🅾️ to start",120,7)
 end
 
+function draw_zoom()
+	cls()
+	if zoomdur>60 then
+		sspr(0,96,74,26,30-(2.4*zoom),40-zoom,74+(4.8*zoom),26+(2*zoom))
+		zoom+=0.125
+		zoomdur-=1
+	elseif zoomdur>0 then
+		draw_game()
+		rectfill(0,0,0,127,0)
+		rectfill(0,0,127,70-(2*zoom),0)
+		rectfill(0,40+(2*zoom),127,127,0)
+		palt(0,false)
+		palt(8,true)
+		sspr(0,96,74,26,30-(2.4*zoom),40-zoom,74+(4.8*zoom),26+(2*zoom))
+		zoom+=0.25
+		zoomdur-=1
+	else
+		pal()
+		startgame()
+		_upd=update_game
+		_drw=draw_game
+	end
+end
+
+function draw_confirm()
+	if confirmdur>0 then
+		local col
+		if confirmdur>15 then
+			col=10
+		elseif confirmdur>10 then
+			col=7
+		else
+			col=10
+		end
+		print_centered("press ❎/🅾️ to start",120,col)
+		
+		confirmdur-=1
+	else
+		_drw=draw_zoom
+	end
+end
 
 function draw_gameover()
 
@@ -251,8 +316,8 @@ function getbutt()
 	end
 end
 
-function print_centered(str,y)
-  print(str, 64 - (#str * 2), y)
+function print_centered(str,y,col)
+  print(str, 64 - (#str * 2), y,col)
 end
 
 function checkenemy(dx,dy)
