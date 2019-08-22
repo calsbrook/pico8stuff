@@ -15,7 +15,8 @@ function _init()
 	}
 	mobcanattack=true
 	notifications={}
-	zoomdur=200
+	initialdur=200
+	zoomdur=initialdur
 	zoom=0
 	player={
 		x=3,
@@ -38,6 +39,14 @@ function _init()
 		dustheal=1,
 	}
 	confirmdur=20
+	mob={}
+	addmob(1,13,5)
+	addmob(2,14,5)
+	addmob(3,14,6)
+	addmob(1,10,6)
+	addmob(1,11,6)
+	addmob(1,12,6)
+	addmob(1,13,6)
 end
 
 function _update()
@@ -83,14 +92,8 @@ function startgame()
 		p8=84,
 	}
 	wind={}
-	mob={}
-	addmob(1,13,5)
-	addmob(2,14,5)
-	addmob(3,14,6)
-	addmob(1,10,6)
-	addmob(1,11,6)
-	addmob(1,12,6)
-	addmob(1,13,6)
+	
+	
 end
 
 
@@ -148,12 +151,6 @@ end
 function draw_title()
 	cls()
 	local x,y = 30,40
-	-- for i=0,9 do
-	-- 	spr(192+i,x+i*8,y+0)
-	-- 	spr(208+i,x+i*8,y+8)
-	-- 	spr(224+i,x+i*8,y+16)
-	-- 	spr(240+i,x+i*8,y+24)
-	-- end
 	sspr(0,96,74,26,30,40)
 	
 	spr(1,x,y+35)
@@ -171,23 +168,23 @@ function draw_title()
 end
 
 function draw_zoom()
+	local zoomframes=initialdur-zoomdur
 	cls()
-	if zoomdur>60 then
-		sspr(0,96,74,26,30-(2.4*zoom),40-zoom,74+(4.8*zoom),26+(2*zoom))
-		zoom+=0.125
+	if zoomdur>125 then
+		sspr(0,96,74,30,30-(2.4*zoom),40-(1.05*zoom),74+(4.8*zoom),26+(2*zoom))
+		zoom=(0.1*zoomframes)+(1.05^zoomframes)
 		zoomdur-=1
 	elseif zoomdur>0 then
 		draw_game()
-		rectfill(0,0,0,127,0)
-		rectfill(0,0,127,70-(2*zoom),0)
-		rectfill(0,40+(2*zoom),127,127,0)
+		rectfill(0,40+(1.05*zoom),127,127,0)
 		palt(0,false)
 		palt(8,true)
-		sspr(0,96,74,26,30-(2.4*zoom),40-zoom,74+(4.8*zoom),26+(2*zoom))
-		zoom+=0.25
+		sspr(0,96,74,31,30-(2.4*zoom),40-(1.05*zoom),74+(4.8*zoom),26+(2*zoom))
+		zoom=(0.1*zoomframes)+(1.05^zoomframes)
 		zoomdur-=1
-	else
 		pal()
+	else
+		draw_game()
 		startgame()
 		_upd=update_game
 		_drw=draw_game
