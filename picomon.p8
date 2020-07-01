@@ -11,6 +11,8 @@ ages = {
 selected = 0
 currentpoop=19
 eatingtimer = 120
+trainingtimer = 120
+trainingcounter = 0
 
 icons = {
 "status","eat","train","poop","lights","medic","cry"
@@ -143,6 +145,23 @@ function updatestatus()
 	end
 end
 
+function updatetrain()
+	trainingtimer-=1
+	if trainingtimer > 0 then
+		if btnp(❎) or btnp(🅾️) then
+			trainingcounter+=1
+		end
+	else
+		if trainingcounter>=5 then
+			boy.strength+=1
+		end
+		trainingtimer=120
+		trainingcounter=0
+		_drw=normaldraw
+		_upd=updatebaby
+	end
+end
+
 updates = {updateegg,updatebaby,death}
 -->8
 --draw
@@ -244,6 +263,16 @@ function drawstatus()
 		end
 	end
 end
+
+function drawtrain()
+	drawboy()
+	palt(7,true)
+	palt(0,false)
+	for i=0, trainingcounter do
+		spr(200, boy.x-9,boy.y-(2*i),1,1)
+	end
+end
+
 -->8
 --inputs
 function checkinput()
@@ -283,7 +312,8 @@ function checkinput()
 			
 			if boy.strength < boy.strengthmax then
 				sfx(0)
-				boy.strength += 1
+				_drw=drawtrain
+				_upd=updatetrain
 			else
 				sfx(2)
 			end
