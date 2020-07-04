@@ -10,19 +10,19 @@ ages = {
 --make objects in the object to reference multiple evolutions in an age
 
 {sprite=32, evolve=300, nextevo=1, maxmistakes=5},
-{sprite=1, evolve=1500},
-{sprite=6, evolve=2500},
-{sprite=10,evolve=30000},
+{sprite=1, evolve=1500,attacksprite=15},
+{sprite=6, evolve=2500,attacksprite=15},
+{sprite=10,evolve=30000,attacksprite=21},
 }
 
 selected = 0
 currentpoop=19
 eatingtimer = 120
-trainingtimer = 120
+trainingtimer = 90
 trainingcounter = 0
 evolvetimer = 120
 col=15
-cleany=0
+cleany=9
 attackx=0
 
 icons = {
@@ -49,6 +49,7 @@ currentsprite=32,
 calling=false,
 evolve=300,
 totalstrength=0,
+attacksprite=15,
 }
 
 
@@ -124,6 +125,7 @@ end
 
 function eating()
 	boy.x=28
+	boy.poopcountdown-=1
 	eatingtimer -= 1
 	if eatingtimer%30==0 then
 		if boy.currentsprite==boy.sprite+2 then
@@ -162,8 +164,10 @@ end
 
 function updatetrain()
 	trainingtimer-=1
+	boy.poopcountdown-=1
 	if trainingtimer > 0 then
 		if btnp(❎) or btnp(🅾️) then
+			sfx(0)
 			trainingcounter+=1
 		end
 	else
@@ -175,8 +179,6 @@ function updatetrain()
 			boy.totalstrength+=1
 		end
 		trainingtimer=120
-		trainingcounter=0
-		--boy.x=32
 		attackx=boy.x-8
 		boy.currentsprite=boy.sprite+3
 		_drw=drawattack
@@ -190,28 +192,33 @@ function updateevolve()
 	if evolvetimer <=0 then
 		evolvetimer=120
 		boy.age+=1
-		boy.evolve=ages[boy.age].evolve
-		boy.sprite=ages[boy.age].sprite
+		modelboy=ages[boy.age]
+		boy.evolve=modelboy.evolve
+		boy.sprite=modelboy.sprite
 		boy.currentsprite=boy.sprite
+		boy.attacksprite=modelboy.attacksprite
 		_drw=normaldraw
 		_upd=updatebaby
 	end
 end
 
 function updateclean()
-	cleany+=1
+	cleany+=2
 	
-	if cleany >= 72 then
+	if cleany >= 48 then
 		boy.poops=0
 		_drw=normaldraw
+		cleany=9
 		_upd=updatebaby
 	end
 end
 
 function updateattack()
 	attackx-=1
+	boy.poopcountdown-=1
 	if attackx <= 13 then
 		boy.x=28
+		trainingcounter=0
 		_drw=normaldraw
 		_upd=updatebaby
 	end
@@ -226,7 +233,7 @@ function normaldraw()
  drawfood()
  --print(t,0,9,0)
  --print(boy.issick,0,15,0)
-	--print(boy.poopcountdown,0,21,0)
+	print(boy.poopcountdown,0,21,0)
 	--print(boy.mistakes,0,27,0)
 end
 
@@ -349,8 +356,8 @@ function drawevolve()
 end
 
 function drawdeath()
-	drawboy()
 	drawpoops()
+	drawboy()
 	print("rip in pepperoni",0,15,5)
 	print("your boy was "..boy.age-1,5,boy.y+13,5)
 end
@@ -375,8 +382,10 @@ function drawattack()
 	for i=0,2 do
 		spr(201, 5, boy.y-(i*8),1,1)
 	end
-	spr(15,attackx,boy.y,1,1)
-	spr(15,attackx,boy.y-8,1,1)
+	spr(boy.attacksprite,attackx,boy.y,1,1)
+	if trainingcounter>=10 then
+		spr(boy.attacksprite,attackx,boy.y-8,1,1)
+	end
 end
 -->8
 --inputs
@@ -486,8 +495,8 @@ end
 -->8
 --features
 function checkpoop()
-	if boy.poopcountdown == 0 then
-		boy.poopcountdown= 500 + flr(rnd(500))
+	if boy.poopcountdown <= 0 then
+		boy.poopcountdown= 300 + flr(rnd(300) + (200*boy.age))
 		if boy.poops < 4 then
 			boy.poops += 1
 		else
@@ -533,6 +542,15 @@ function _init()
 	--make 64x64
 	poke(0x5f2c,3)
 	cls()
+	selected = 0
+	currentpoop=19
+	eatingtimer = 120
+	trainingtimer = 90
+	trainingcounter = 0
+	evolvetimer = 120
+	col=15
+	cleany=9
+	attackx=0
 	_upd = updateegg
 	_drw = normaldraw
 	t=0
