@@ -4,20 +4,13 @@ __lua__
 
 function _init()
 	t=0
-	gameboard = {
-		{0,0,12,0,0,0},
-		{11,0,0,0,0,0},
-		{0,0,0,0,0,0},
-		{0,0,0,0,0,9},
-		{0,14,0,11,0,0},
-		{0,14,0,0,0,0},
-		{0,0,0,0,0,0},
-		{0,0,0,0,0,9},
-		{0,11,0,0,0,0},
-		{0,0,0,0,0,0},
-		{11,0,12,12,9,9},
-	}
+	gameboard = {}
+	for i=1, 11 do 
+		add(gameboard, {0,0,0,0,0,0})
+	end
 	locations = {}
+	allblobs = {{x=1,y=1,col=9}, {x=3,y=1,col=9},{x=2,y=4,col=9}}
+	placeblobs()
 end
 
 function _draw()
@@ -32,7 +25,6 @@ function _draw()
 		end
 	end
 	rect(0,0,8*6+1,8*11+1)
-	print(locations[1],0,0,5)
 end
 
 function findconnect(x,y)
@@ -79,8 +71,17 @@ end
 function _update()
 	t+=1
 	if t%30==0 then
+		-- checkallblobs()
 		gravity()
+		placeblobs()
 	end
+end
+
+function placeblobs()
+	foreach(allblobs, function(blob)
+		printh("y:"..blob.y.."x:"..blob.x)
+		gameboard[blob.y][blob.x] = blob.col
+	end)
 end
 
 function gravity()
@@ -88,13 +89,14 @@ function gravity()
 		for j=1, #gameboard[i] do
 			y = 12-i
 			x = j
-			if gameboard[y][x] > 0 then
-				if y<11 and gameboard[y+1][j] == 0 then
-					temp = gameboard[y][x]
-					gameboard[y][x] = 0
-					gameboard[y+1][x] = temp
+			foreach(allblobs, function(blob)
+				if blob.y== y and blob.x==x then
+					if blob.y < 11 then
+						gameboard[blob.y][blob.x] = 0
+						blob.y+=1
+					end
 				end
-			end
+			end)
 		end
 	end
 end
@@ -102,10 +104,12 @@ end
 function checkallblobs()
 	for i=1, #gameboard do
 		for j=1, #gameboard[i] do
+			--REWRITE SO THAT WE HAVE A LIST OF BLOBS RATHER THAN CYCLING THROUGH EVERYTHING
 			if gameboard[i][j] > 0 then
-				test = findblobsize(x,y)
-				
-				if locations >= 4 then
+				size = 1
+				test = findblobsize(j,i)
+				-- printh(test)
+				if size >= 4 then
 					foreach(locations, 
 					function(obj) 
 						gameboard[obj[2]][obj[1]] = 0
@@ -119,10 +123,12 @@ end
 function findblobsize(x,y)
 	locations = {{x,y}}
 	checkallsides(x,y)
+	-- printh(locations)
 	return locations
 end
 
 function checkallsides(x,y)
+	
 	col = gameboard[y][x]
 	if y<11 then
 		if gameboard[y+1][x] == col then
@@ -130,6 +136,7 @@ function checkallsides(x,y)
 				if locations[i][1] == x and locations[i][2] == y+1 then
 					return
 				else
+					size += 1
 					add(locations, {x,y+1})
 					checkallsides(x,y+1)
 				end
@@ -143,6 +150,7 @@ function checkallsides(x,y)
 				if locations[i][1] == x and locations[i][2] == y-1 then
 					return
 				else
+					size += 1
 					add(locations, {x,y-1})
 					checkallsides(x,y-1)
 				end
@@ -156,6 +164,7 @@ function checkallsides(x,y)
 				if locations[i][1] == x+1 and locations[i][2] == y then
 					return
 				else
+					size += 1
 					add(locations, {x+1,y})
 					checkallsides(x+1,y)
 				end
@@ -169,12 +178,14 @@ function checkallsides(x,y)
 				if locations[i][1] == x-1 and locations[i][2] == y then
 					return
 				else
+					size += 1
 					add(locations, {x+1,y})
 					checkallsides(x+1,y)
 				end
 			end
 		end
 	end
+	-- printh(size)
 	return
 end
 __gfx__
