@@ -9,7 +9,7 @@ function _init()
 		add(gameboard, {0,0,0,0,0,0})
 	end
 	locations = {}
-	allblobs = {{x=1,y=1,col=9}, {x=3,y=1,col=9},{x=2,y=4,col=9}}
+	allblobs = {{x=1,y=1,col=9}, {x=3,y=1,col=9},{x=2,y=4,col=9},{x=2,y=1,col=9},{x=1,y=11,col=11}}
 	placeblobs()
 end
 
@@ -70,8 +70,8 @@ end
 
 function _update()
 	t+=1
-	if t%30==0 then
-		-- checkallblobs()
+	if t%20==0 then
+		checkallblobs()
 		gravity()
 		placeblobs()
 	end
@@ -79,7 +79,6 @@ end
 
 function placeblobs()
 	foreach(allblobs, function(blob)
-		printh("y:"..blob.y.."x:"..blob.x)
 		gameboard[blob.y][blob.x] = blob.col
 	end)
 end
@@ -90,10 +89,12 @@ function gravity()
 			y = 12-i
 			x = j
 			foreach(allblobs, function(blob)
-				if blob.y== y and blob.x==x then
+				if (blob.y == y and blob.x == x) then
 					if blob.y < 11 then
-						gameboard[blob.y][blob.x] = 0
-						blob.y+=1
+						if gameboard[y+1][j] == 0 then
+							gameboard[blob.y][blob.x] = 0
+							blob.y+=1
+						end
 					end
 				end
 			end)
@@ -102,33 +103,46 @@ function gravity()
 end
 
 function checkallblobs()
-	for i=1, #gameboard do
-		for j=1, #gameboard[i] do
-			--REWRITE SO THAT WE HAVE A LIST OF BLOBS RATHER THAN CYCLING THROUGH EVERYTHING
-			if gameboard[i][j] > 0 then
-				size = 1
-				test = findblobsize(j,i)
-				-- printh(test)
-				if size >= 4 then
-					foreach(locations, 
-					function(obj) 
-						gameboard[obj[2]][obj[1]] = 0
-					end)
-				end
-			end
+	foreach(allblobs, function(blob1)
+		size = 1
+		attached = {}
+		add(attached, blob1)
+		findblobsize(blob1)
+		if size >=4 then
+			foreach(attached, function(dead)
+				foreach(allblobs, function(blob)
+					if blob.x == dead.x and blob.y == dead.y then
+						gameboard[blob.y][blob.x] = 0
+						del(allblobs, blob)
+					end
+				end)
+			end)
 		end
-	end
+	end)
 end
 
-function findblobsize(x,y)
-	locations = {{x,y}}
-	checkallsides(x,y)
-	-- printh(locations)
-	return locations
+function findblobsize(blob2)
+	foreach(allblobs, function(blob3)
+		noted, connected = false
+		foreach(attached, function(att)
+			if att.x == blob3.x and att.y == blob3.y and att.col == blob3.col then
+				noted = true
+			end
+			if blob3.col == att.col then
+				if (blob3.x == (att.x+1 or att.x-1) and blob3.y==att.y) or (blob3.y == (att.y+1 or att.y-1) and blob3.x==att.x) then
+					connected = true
+				end
+			end
+		end)
+		if noted == false and connected == true then
+			size += 1
+			add(attached, blob3)
+			findblobsize(blob3)
+		end
+	end)
 end
 
 function checkallsides(x,y)
-	
 	col = gameboard[y][x]
 	if y<11 then
 		if gameboard[y+1][x] == col then
@@ -143,7 +157,6 @@ function checkallsides(x,y)
 			end
 		end
 	end
-	
 	if y>1 then
 		if gameboard[y-1][x] == col then
 			for i=1, #locations do
@@ -157,7 +170,6 @@ function checkallsides(x,y)
 			end
 		end
 	end
-	
 	if x<11 then
 		if gameboard[y][x+1] == col then
 			for i=1, #locations do
@@ -171,7 +183,6 @@ function checkallsides(x,y)
 			end
 		end
 	end
-	
 	if x>1 then
 		if gameboard[y][x-1] == col then
 			for i=1, #locations do
@@ -185,7 +196,6 @@ function checkallsides(x,y)
 			end
 		end
 	end
-	-- printh(size)
 	return
 end
 __gfx__
