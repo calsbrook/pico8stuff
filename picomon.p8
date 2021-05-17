@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 18
+version 29
 __lua__
 --data
 ages = {
@@ -11,8 +11,8 @@ ages = {
 
 {sprite=32, width=1, height=1, evolve=300, nextevo=1, maxmistakes=5},
 {sprite=1, width=1, height=1, evolve=1500,attacksprite=15},
---{sprite=6, width=1, height=1, evolve=2500,attacksprite=15},
---{sprite=10,width=1, height=1, evolve=3500,attacksprite=21},
+{sprite=6, width=1, height=1, evolve=2500,attacksprite=15},
+{sprite=10,width=1, height=1, evolve=3500,attacksprite=21},
 {sprite=22, width=2,height=2,evolve=30000,attacksprite=21},
 }
 
@@ -221,7 +221,7 @@ function normaldraw()
  drawfood()
  --print(t,0,9,0)
  --print(boy.issick,0,15,0)
-	print(boy.evolve-t,0,21,0)
+	--print(boy.evolve-t,0,21,0)
 	--print(boy.mistakes,0,27,0)
 end
 

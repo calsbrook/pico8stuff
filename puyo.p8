@@ -9,7 +9,7 @@ function _init()
 		add(gameboard, {0,0,0,0,0,0})
 	end
 	locations = {}
-	allblobs = {{x=1,y=1,col=9}, {x=3,y=1,col=9},{x=2,y=4,col=9},{x=2,y=1,col=9},{x=1,y=11,col=11}}
+	allblobs = {{x=1,y=1,col=9}, {x=3,y=1,col=9},{x=2,y=1,col=9},{x=1,y=11,col=11},{x=2,y=11,col=9},{x=3,y=11,col=9},}
 	placeblobs()
 end
 
