@@ -37,7 +37,7 @@ function _draw()
 	--print(selection[1],0,0,7)
 	--cursor(0,7)
 	--print(selection[2])
-	--print(check_occupied(selection[1],selection[2]))
+	--print(check_occupied(selection[1],selection[2]),7)
 	--print(turn)
 	-- print(state)
 	--print(check_range(1,1,selection[1],selection[2]))
@@ -123,8 +123,10 @@ end
 -- draw functions
 
 function drawboard()
+	
 	rectfill(0,0,128,128,0)
 	map(0,0)
+	
 	for i=1, 5 do
 		j = i
 		while j > 0 do
@@ -172,7 +174,6 @@ function drawboard()
 			end
 		end
 	end
-	
 end
 
 function draw_winner()
