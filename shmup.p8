@@ -1,0 +1,103 @@
+pico-8 cartridge // http://www.pico-8.com
+version 32
+__lua__
+player = {
+	x = 64,
+	y = 64,
+	sprite = 1,
+	speed = 2
+}
+playerbullets = {}
+function _init()
+	cls()
+end
+
+function _draw()
+	cls()
+	print(#playerbullets)
+	if #playerbullets >=1 then
+		print(playerbullets[1][2])
+	end
+	drawship()
+	drawplayerbullets()
+end
+
+function drawship()
+	spr(player.sprite, player.x, player.y)
+end
+
+function drawplayerbullets()
+	for i=1,#playerbullets do
+		line(playerbullets[i][1],playerbullets[i][2],playerbullets[i][1],playerbullets[i][2]+1,8)
+	end
+end
+function _update()
+	updateplayerbullets()
+	getshooting()
+	moveship()
+	
+end
+
+function getshooting()
+	if btn(❎) then
+		player.speed = 1
+	else
+		player.speed = 2
+	end
+	
+	if btn(🅾️) then
+		if #playerbullets < 5 then
+			fire()
+		end
+	end
+end
+
+function updateplayerbullets()
+    todelete = {}
+	for i=1,#playerbullets do
+		playerbullets[i][2]-=5
+		if playerbullets[i][2] <= 0 then
+            add(todelete, playerbullets[i])
+		end
+	end
+    for bullet in all(todelete) do
+        del(playerbullets, bullet)
+    end
+end
+
+function fire()
+	sfx(0)
+	playerbullets[#playerbullets+1]={player.x+4,player.y-2-rnd(1)}
+end
+function moveship()
+	if btn(⬅️) then
+		if player.x >= 2 then
+			player.x -= player.speed
+		end
+	elseif btn(➡️) then
+		if player.x <= 118 then
+			player.x += player.speed
+		end
+	end
+	
+	if btn(⬆️) then
+		if player.y >=2 then
+			player.y -= player.speed
+		end
+	elseif btn(⬇️) then
+		if player.y <=118 then
+			player.y += player.speed
+		end
+	end
+end
+__gfx__
+00000000000220000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000002882000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00700700002882000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0007700002e88e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000770002e87c8e20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00700700288118820000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000028558200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000002992000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+__sfx__
+000100001d050230502b0501c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

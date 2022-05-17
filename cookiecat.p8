@@ -118,7 +118,7 @@ end
 
 function _draw()
 	cls()
-	rectfill(0,0,128,128,9)
+	--rectfill(0,0,128,128,9)
 	map()
 	--`print(btnp(❎),1)
 	if cat.shooting then
